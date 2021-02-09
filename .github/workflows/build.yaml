@@ -69,8 +69,10 @@ jobs:
         #if: ${{ endsWith(github.ref, '/ghactions-test') }}  
         run: |
           bash .github/scripts/docker_build_and_push.sh
-     - name: Declare some variables
-       id: vars
+
+      - name: Declare some variables
+        if: ${{ endsWith(github.ref, '/main') }}
+        id: vars
         shell: bash
         run: |
           echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
