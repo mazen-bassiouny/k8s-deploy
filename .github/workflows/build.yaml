@@ -13,7 +13,7 @@ on:
 
 env:
   CODE_SRC_FOLDER: tracktor
-  REGISTRY: bidmaindevk8sk8sreg573m.azurecr.io
+  REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
   REPOSITORY: tracktor
   LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
   LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -38,6 +38,38 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+
+  build:
+  name: Build Tracktor
+  runs-on: ubuntu-latest
+  needs: test
+  env:
+    DOCKER_BUILDKIT: 1
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v2.2.0
+
+    - name: Prepare SSH-Keys
+      uses: shimataro/ssh-key-action@v2.0.3
+      with:
+        key: ${{ secrets.CROSS_PULL_GIT_ACTIONS }}
+        known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+    - name: Generate Tags
+      run: |
+        echo "FIRST_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
+        echo $FIRST_TAG
+    # step to check .. to be removed.
+    - name: check Tags
+      run: |
+        echo $FIRST_TAG
+    # Call the Docker build script with the correct variables (depending on the branch name)
+    - name: Docker Build and Push "dev"
+      if: ${{ endsWith(github.ref, '/dev') }}
+      #if: ${{ endsWith(github.ref, '/ghactions-test') }}  
+      run: |
+        bash .github/scripts/docker_build_and_push.sh
+
 
 
   
