@@ -1,0 +1,43 @@
+name: Container Build and Trigger Deploy
+on:
+  push:
+    branches:
+      - dev
+      - main 
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Trigger Deployment'
+        requiered: true
+        default: 'false'
+
+env:
+  CODE_SRC_FOLDER: tracktor
+  REGISTRY: bidmaindevk8sk8sreg573m.azurecr.io
+  REPOSITORY: tracktor
+  LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
+  LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  DEV_PAYLOAD: '{"registry": "bidmaindevk8sk8sreg573m.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "bid-main-dev-k8s-cluster-main-9wj4","resource_group": "bid-main-dev-k8s-rg-3gvs","release": "tracktor","namespace": "default","timeout": "10m"}'
+  PROD_PAYLOAD: '{"registry": "be0aks0registry.azurecr.io","repository": "be-tracktor","value_file": "./","cluster": "hihi","resource_group": "cool_name","release": "tracktor","namespace": "tracking","timeout": "10m"}'
+
+jobs:
+  test:
+    name: Test Tracktor
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.2.0
+
+      - name: Prepare SSH-Keys
+        uses: shimataro/ssh-key-action@v2.0.3
+        with:
+          key: ${{ secrets.CROSS_PULL_GIT_ACTIONS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+
+  
