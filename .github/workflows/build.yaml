@@ -76,7 +76,7 @@ jobs:
         shell: bash
         run: |
           echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-          echo "::set-output name=sha_short::$(git rev-list --parents -n 1 ${GITHUB_SHA:1:7}) "
+          echo "::set-output name=sha_short::$(git rev-list --parents -n 1 ${GITHUB_SHA:0:6}) "
 
       - name: Another step
         run: |
