@@ -39,7 +39,7 @@ jobs:
 
       - name: Generate Tags
         run: |
-          echo "FIRST_TAG=$(echo ${GITHUB_SHA:0:6})" >> $GITHUB_ENV
+          echo "FIRST_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
           echo $FIRST_TAG
       # step to check .. to be removed.
       - name: check Tags
@@ -67,7 +67,7 @@ jobs:
 
       - name: get the sha
         run: |
-          echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2
+          echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| cut -c2-8
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
