@@ -60,7 +60,7 @@ jobs:
 
       - name: Docker Login
         run: |
-          az acr login --name ${REGISTRY}
+          az acr login --n mazenatefdevk8sk8sreg42h
 
       - name: Set Image Name
         run: |

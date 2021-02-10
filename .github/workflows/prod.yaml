@@ -66,6 +66,5 @@ jobs:
         run : | 
           echo $PROD_TAG
       
-      - name : Check 
 
   
