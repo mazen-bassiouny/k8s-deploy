@@ -67,6 +67,6 @@ jobs:
 
       - name : blabla 
         run: | 
-          git merge-base $GITHUB_BASE_REF $GITHUB_SHA
+          git merge-base ${GITHUB_BASE_REF} ${GITHUB_SHA}
 
   
