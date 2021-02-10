@@ -85,6 +85,7 @@ jobs:
 
       # For production:
       - name: Import and Retag 'latest' dev Image for production
+        id: check
         #if: ${{ endsWith(github.ref, '/master') }}
         if: ${{ endsWith(github.ref, '/main') }}
         env:
@@ -92,6 +93,10 @@ jobs:
           SUBSCRIPTION: 012901f9-e5ca-44a8-b241-f4a383710f91
         run: |
           echo ${{github}}
-#echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+          echo "::set-output name=cont::$(echo ${{github}}) "
+      - name: Another step
+        run: |
+          echo "Branch: ${{ steps.check.outputs.cont }}"
+
 
   
