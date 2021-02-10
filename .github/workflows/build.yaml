@@ -40,7 +40,7 @@ jobs:
       # step to check .. to be removed.
       - name: check "dev" Tag
         run: |
-          echo $Dev_TAG
+          echo $DEV_TAG
       # Call the Docker build script with the correct variables (depending on the branch name)
       - name: Image Build and Push "dev"
         env:
@@ -73,7 +73,7 @@ jobs:
           environment: testing
           payload: ${DEV_PAYLOAD}
           auto_merge: false
-          required_contexts: '["Test Tracktor", "Build Tracktor"]'
+          required_contexts: '["Build Tracktor"]'
           description: Automatic deployment triggered from Pipeline
         env:
           GITHUB_TOKEN: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
