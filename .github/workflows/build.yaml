@@ -93,6 +93,11 @@ jobs:
         env:
           atef: ${{ toJson( github.event.commits[0].id) }}
         run: |
-          echo $atef
+          echo $atef 
+      - name: Print environment variables
+        uses: FranzDiebold/github-env-vars-action@v2
+        run: |
+          echo "CI_SHA_SHORT=$CI_SHA_SHORT"
+          echo "CI_SHA=$CI_SHA"
 
   
