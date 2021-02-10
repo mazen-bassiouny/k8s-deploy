@@ -71,7 +71,7 @@ jobs:
               - flash
           ref: ${{ github.sha }}
           environment: testing
-          payload: ${DEV_PAYLOAD}
+          payload: ${{ steps.set-post-options.outputs.payload }}
           auto_merge: false
           required_contexts: '["Build Tracktor"]'
           description: Automatic deployment triggered from Pipeline
