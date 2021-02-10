@@ -89,4 +89,10 @@ jobs:
         run: |
           echo $mazen
 
+      - name: Dump GitHub event
+        env:
+          atef: ${{ toJson( github.event) }}
+        run: |
+          echo $atef
+
   
