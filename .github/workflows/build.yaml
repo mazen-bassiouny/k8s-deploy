@@ -86,7 +86,8 @@ jobs:
       - name : loop 
         id : loo
         #run : for f in ${{github.payload.commits}}; do echo "::set-output name=testi::$(git rev-list --parents -n 1 ${GITHUB_SHA:0:6}) "; done
-        run: echo ${{github}}.payload.commits[0].id 
+        #run: echo ${{github}}.payload.commits[0].id 
+        run : echo ${GITHUB_EVENT_PATH}
 
 
   
