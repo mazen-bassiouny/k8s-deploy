@@ -68,9 +68,14 @@ jobs:
       - name: get the sha
         run: |
          echo "last_tag= \
-           $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| cut -c2-8)" \
+           $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
+           cut -c2-8)" \
            >> $GITHUB_ENV
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
+      
+      - name : check last tag 
+        run : | 
+          echo $last_tag
 
   
