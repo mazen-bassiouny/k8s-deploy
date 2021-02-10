@@ -60,12 +60,12 @@ jobs:
 
       - name: Docker Login
         run: |
-          az acr login --n mazenatefdevk8sk8sreg42h
+          az acr login -n mazenatefdevk8sk8sreg42h
 
       - name: Set Image Name
         run: |
-          echo "::set-env name=IMAGE_NAME::$(echo ${REGISTRY}/${REPOSITORY})"
-          echo "::set-env name=IMAGE_TAG::$(echo ${GITHUB_SHA:1:7})"
+          echo "IMAGE_NAME=$(echo ${REGISTRY}/${REPOSITORY})" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
 
       - name: Check if Docker image exists
         run: |
