@@ -68,7 +68,7 @@ jobs:
         if: ${{ endsWith(github.ref, '/dev') }}
         #if: ${{ endsWith(github.ref, '/ghactions-test') }}  
         run: |
-          bash .github/scripts/docker_build_and_push.sh
+         echo ${{github}}
 
       - name: Declare some variables
         if: ${{ endsWith(github.ref, '/main') }}
@@ -85,16 +85,18 @@ jobs:
 
       # For production:
       - name: Import and Retag 'latest' dev Image for production
+        id: check
         #if: ${{ endsWith(github.ref, '/master') }}
         if: ${{ endsWith(github.ref, '/main') }}
         env:
           TENANT: ${{ secrets.AZURE_CLIENT_TENANT }}
           SUBSCRIPTION: 012901f9-e5ca-44a8-b241-f4a383710f91
         run: |
-          az login --service-principal -u ${LOGIN_USER} -p ${LOGIN_SECRET} --tenant ${TENANT}
-          az account set --subscription=${SUBSCRIPTION}
-          az acr import -n ${REGISTRY} --source ${REGISTRY}/${REPOSITORY}:latest --image ${REPOSITORY}:${FIRST_TAG}
+          echo ${{github}}
+          echo "::set-output name=cont::$(echo ${{github}}) "
+      - name: Another step
+        run: |
+          echo "Branch: ${{ steps.check.outputs.cont }}"
 
-#echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
   
