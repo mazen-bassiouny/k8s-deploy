@@ -91,7 +91,7 @@ jobs:
 
       - name: Dump GitHub event
         env:
-          atef: ${{ toJson( github.event) }}
+          atef: ${{ toJson( github.event.commits) }}
         run: |
           echo $atef
 
