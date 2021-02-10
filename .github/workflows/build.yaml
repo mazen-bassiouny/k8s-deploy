@@ -65,8 +65,10 @@ jobs:
         with:
           script: console.log(context.payload.commits)
 
-      - name : blabla 
-        run: | 
-          git merge-base --fork-point ${GITHUB_BASE_REF} ${GITHUB_SHA}
+      - name: get the sha
+        run: |
+          echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1 |sed 's/\"//g'
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
 
   
