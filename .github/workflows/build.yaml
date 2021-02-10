@@ -67,6 +67,6 @@ jobs:
 
       - name : blabla 
         run: | 
-          echo "$GITHUB_CONTEXT"| jq '.event.commits[].id
+          echo "$GITHUB_CONTEXT"| jq '.event.commits[].id'
 
   
