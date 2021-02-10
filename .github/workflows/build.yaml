@@ -85,7 +85,7 @@ jobs:
 
       - name: Dump GitHub context
         env:
-        mazen: ${{ toJson(github) }}
+          mazen: ${{ toJson(github) }}
         run: |
           echo $mazen
 
