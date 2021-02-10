@@ -15,9 +15,7 @@ env:
   CODE_SRC_FOLDER: tracktor
   REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
   REPOSITORY: tracktor
-  LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
-  LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-  DEV_PAYLOAD: '{"registry": "bidmaindevk8sk8sreg573m.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "bid-main-dev-k8s-cluster-main-9wj4","resource_group": "bid-main-dev-k8s-rg-3gvs","release": "tracktor","namespace": "default","timeout": "10m"}'
+  DEV_PAYLOAD: '{"registry": "mazenatefdevk8sk8sreg42h.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
   PROD_PAYLOAD: '{"registry": "be0aks0registry.azurecr.io","repository": "be-tracktor","value_file": "./","cluster": "hihi","resource_group": "cool_name","release": "tracktor","namespace": "tracking","timeout": "10m"}'
 
 jobs:
@@ -37,45 +35,48 @@ jobs:
           key: ${{ secrets.CROSS_PULL_GIT_ACTIONS }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
-      - name: Generate Tags
+      - name: Generate Image Tags "dev"
         run: |
-          echo "FIRST_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
-          echo $FIRST_TAG
+          echo "DEV_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
       # step to check .. to be removed.
-      - name: check Tags
+      - name: check "dev" Tag
         run: |
-          echo $FIRST_TAG
+          echo $Dev_TAG
       # Call the Docker build script with the correct variables (depending on the branch name)
-      - name: Docker Build and Push "dev"
-        if: ${{ endsWith(github.ref, '/dev') }}
-        #if: ${{ endsWith(github.ref, '/ghactions-test') }}  
-        run: |
-         echo ${{github}}
-
-      - name: Declare some variables
-        if: ${{ endsWith(github.ref, '/main') }}
-        id: vars
-        shell: bash
-        run: |
-          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-          echo "::set-output name=sha_short::$(git rev-list --parents -n 1 ${GITHUB_SHA:0:6}) "
-
-      - name: View context attributes
-        uses: actions/github-script@v3
-        with:
-          script: console.log(context.payload.commits)
-
-      - name: get the sha
-        run: |
-         echo "last_tag= \
-           $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
-           cut -c2-8)" \
-           >> $GITHUB_ENV
+      - name: Image Build and Push "dev"
         env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
+          LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
+          LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        run: |
+         bash .github/scripts/docker_build_and_push.sh
       
-      - name : check last tag 
-        run : | 
-          echo $last_tag
+  deploy:
+    name: Trigger Testing Deployment
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ endsWith(github.ref, '/dev') || github.event.inputs.deploy == 'true' }}
+    steps:
+      - name: Generate Payload
+        id: set-post-options
+        run: |
+          echo "::set-output name=environment::$(echo 'testing')"
+          echo "::set-output name=payload::$(echo ${DEV_PAYLOAD})"
 
-  
+      - name: Create Deployment
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/:repository/deployments
+          repository: ${{ github.repository }}
+          mediaType: |
+            previews:
+              - flash
+          ref: ${{ github.sha }}
+          environment: testing
+          payload: ${DEV_PAYLOAD}
+          auto_merge: false
+          required_contexts: '["Test Tracktor", "Build Tracktor"]'
+          description: Automatic deployment triggered from Pipeline
+        env:
+          GITHUB_TOKEN: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
+          # Needs a service user token because the normal GitHub Action token is not allowed to trigger other workflows:
+          # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#triggering-new-workflows-using-a-personal-access-token
