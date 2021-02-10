@@ -83,12 +83,23 @@ jobs:
         with:
           script: console.log(context.payload.commits)
 
-      - name : loop 
-        id : loo
-        #run : for f in ${{github.payload.commits}}; do echo "::set-output name=testi::$(git rev-list --parents -n 1 ${GITHUB_SHA:0:6}) "; done
-        run: echo "::set-output name=testi::$(echo ${{github.payload.commits[0].id}}) " 
-      - name : check output
-        run : echo ${{ steps.loop.outputs.testi }}  
+      - name: Dump GitHub context
+        env:
+          mazen: ${{ toJson(github) }}
+        run: |
+          echo $mazen
 
+      - name: Dump GitHub event
+        env:
+          atef: ${{ toJson( github.event.commits[0].id) }}
+        run: |
+          echo $atef 
+      - name: Print environment variables
+        uses: FranzDiebold/github-env-vars-action@v2
+        
+      - name : checing 
+        run: |
+          echo "CI_SHA_SHORT=$CI_SHA_SHORT"
+          echo "CI_SHA=$CI_SHA"
 
   
