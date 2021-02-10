@@ -77,7 +77,7 @@ jobs:
           moustafa: ${{ toJson( github.event.commits) }}
         run: |
           echo $atef 
-          commits=${{join(github.event.commits.*.id, ', ') }}  
+          commits=${{join(github.event.commits.*.message, ', ') }}  
           echo $commits  
       - name: Print environment variables
         uses: FranzDiebold/github-env-vars-action@v2
