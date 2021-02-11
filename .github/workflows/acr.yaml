@@ -1,0 +1,36 @@
+name: Container Build and Trigger Deploy ## comment
+on:
+  push:
+    branches:
+      - acr 
+
+env:
+  CODE_SRC_FOLDER: tracktor
+  REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
+  REPOSITORY: tracktor
+  LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
+  LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  DEV_PAYLOAD: '{"registry": "bidmaindevk8sk8sreg573m.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "bid-main-dev-k8s-cluster-main-9wj4","resource_group": "bid-main-dev-k8s-rg-3gvs","release": "tracktor","namespace": "default","timeout": "10m"}'
+  PROD_PAYLOAD: '{"registry": "bidmaindevk8sk8sreg573m.azurecr.io","repository": "tracktor","value_file": "./helm/value-prod.yml","cluster": "bid-main-dev-k8s-cluster-main-9wj4","resource_group": "bid-main-dev-k8s-rg-3gvs","release": "tracktor","namespace": "default","timeout": "10m"}'
+  DEV_TAG : 10b1ac5
+jobs:
+
+  build:
+    name: Build Tracktor
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.2.0
+
+      - name : awk 
+        run : | 
+          echo "DEV_COMMIT= \
+           $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
+           awk '{print substr($0,1,7)}')" \
+           >> $GITHUB_ENV
+        
+        
+
+      
