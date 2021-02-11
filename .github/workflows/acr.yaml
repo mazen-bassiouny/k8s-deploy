@@ -34,6 +34,12 @@ jobs:
 
       - name : check 
         run : echo $DEV_COMMIT
+      - name: yalla
+        run : | 
+           echo "DEV_COMMIT2= $(echo "$DEV_COMMIT")"
+      
+      - name : run 
+        run : echo ${DEV_COMMIT2}
 
 
 
