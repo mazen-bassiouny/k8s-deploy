@@ -39,7 +39,7 @@ jobs:
       - name: Generate Image Tags "prod"
         if: ${{ endsWith(github.ref, '/main') }}
         run: |
-          echo "PROD_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
+          echo "PROD_TAG=$(echo ${GITHUB_SHA:0:6})" >> $GITHUB_ENV
       # step to check .. to be removed.
       - name: check "prod" Tag
         run: |
@@ -50,12 +50,11 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
-         echo "DEV_COMMIT= \
-           $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g')" \
-           >> $GITHUB_ENV
+          echo "DEV_TAG= \
+            $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
+            awk '{print substr($0,0,7)}' |sed 's/ //g')" \
+            >> $GITHUB_ENV
         
-      - name: Get Image Dev tag 
-        run : echo "DEV_TAG=$(echo ${DEV_COMMIT:1:7})" >> $GITHUB_ENV
     
       
       - name : check "DEV" Tag
