@@ -29,8 +29,7 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run : | 
           echo "DEV_COMMIT= \
-           $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
-           awk '{print substr($0,0,7)}' | xargs)" \
+           $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g')" \
            >> $GITHUB_ENV
 
       - name : check 
