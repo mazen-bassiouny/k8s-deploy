@@ -28,18 +28,10 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run : | 
-          echo "DEV_COMMIT= \
-           $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id'  | sed 's/[[:space:]]//g')">> $GITHUB_ENV
+          echo "DEV_COMMIT=$(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id'  | sed 's/[[:space:]]//g')">> $GITHUB_ENV
 
       - name : check 
         run : echo $DEV_COMMIT
-      - name: yalla
-        run : | 
-           echo "prefix= $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id')" >> $GITHUB_ENV
-      
-      - name : run 
-        run : echo $prefix
-
 
 
 
