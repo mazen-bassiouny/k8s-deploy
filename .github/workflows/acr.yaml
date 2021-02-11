@@ -41,7 +41,7 @@ jobs:
       - name : List all tags in the ACR
         id : tags
         run : |
-          echo "TAGS=$(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY})" >> $GITHUB_ENV
+          echo "TAGS=$(echo $(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY}))" >> $GITHUB_ENV
          
       - name : check if tag exists 
         run : |
