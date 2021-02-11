@@ -89,7 +89,6 @@ jobs:
     name: Trigger Production Deployment
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ endsWith(github.ref, '/dev') || github.event.inputs.deploy == 'true' }}
     steps:
       - name: Generate Payload
         id: set-post-options
