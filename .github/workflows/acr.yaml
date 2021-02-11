@@ -27,7 +27,8 @@ jobs:
       - name : awk 
         run : | 
           echo "DEV_COMMIT= \
-           $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g' )"
+           $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
+           cut -c2-8)" \
            >> $GITHUB_ENV
 
       - name : check 
