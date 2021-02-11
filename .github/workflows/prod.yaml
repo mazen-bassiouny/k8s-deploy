@@ -42,7 +42,6 @@ jobs:
           echo "PROD_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
       # step to check .. to be removed.
       - name: check "prod" Tag
-        if: ${{ endsWith(github.ref, '/dev') }}
         run: |
           echo $PROD_TAG
 
@@ -59,7 +58,7 @@ jobs:
       - name : check "DEV" Tag
         if: ${{ endsWith(github.ref, '/main') }}
         run : | 
-          echo $DEV
+          echo $DEV_TAG
       
       - name: Azure Login
         env:
@@ -73,7 +72,7 @@ jobs:
       - name : List all tags in the ACR
         id : tags
         run : |
-          echo "::set-output name=tags::$(echo 'az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY}')"
+          echo "::set-output name=tags::$(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY})"
 
       - name : check if tag exists 
         run : |
