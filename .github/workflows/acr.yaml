@@ -24,10 +24,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2.2.0
 
-      - name: Docker Login
-        run: |
-          az acr login -n mazenatefdevk8sk8sreg42h
-      
       - name: Azure Login
         if: ${{ github.event.deployment.environment == 'testing' }}
         env:
@@ -37,6 +33,11 @@ jobs:
         run: |
           az login --service-principal -u ${USER} -p ${SECRET} --tenant ${TENANT}
           az account set --subscription="012901f9-e5ca-44a8-b241-f4a383710f91"
+
+      - name: ACR Login
+        run: |
+          az acr login -n mazenatefdevk8sk8sreg42h
+      
 
       - name : List all tags in the ACR
         id : tags
