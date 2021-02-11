@@ -43,9 +43,12 @@ jobs:
         run : |
           echo "TAGS=$(echo $(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY}))" >> $GITHUB_ENV
          
-      - name : check if tag exists 
+      - name : check tags
         run : |
-          echo toJson$TAGS.*
+          echo $TAGS
+      - name : check contain 
+        if: contains(env.TAGS, '10b1ac5')
+        run : echo YUP 
 
  ##echo "::set-output name=tags::$(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY})"
       
