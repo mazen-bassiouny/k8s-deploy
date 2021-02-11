@@ -65,7 +65,7 @@ jobs:
       - name: Set Image Name
         run: |
           echo "IMAGE_NAME=$(echo ${REGISTRY}/${REPOSITORY})" >> $GITHUB_ENV
-          echo "IMAGE_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$(echo ${GITHUB_SHA:0:6})" >> $GITHUB_ENV
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v1
