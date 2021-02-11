@@ -12,7 +12,7 @@ env:
   LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
   DEV_PAYLOAD: '{"registry": "bidmaindevk8sk8sreg573m.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "bid-main-dev-k8s-cluster-main-9wj4","resource_group": "bid-main-dev-k8s-rg-3gvs","release": "tracktor","namespace": "default","timeout": "10m"}'
   PROD_PAYLOAD: '{"registry": "bidmaindevk8sk8sreg573m.azurecr.io","repository": "tracktor","value_file": "./helm/value-prod.yml","cluster": "bid-main-dev-k8s-cluster-main-9wj4","resource_group": "bid-main-dev-k8s-rg-3gvs","release": "tracktor","namespace": "default","timeout": "10m"}'
-
+  DEV_TAG : 10b1ac5
 jobs:
 
   build:
@@ -48,7 +48,7 @@ jobs:
           echo $TAGI
       - name : check contain 
        # if: contains(env.TAGS, '10b1ac5')
-        if: contains( ${{ steps.tags.outputs.TAGI }},'10b1ac5') 
+        if: contains( ${{ steps.tags.outputs.TAGI }},${DEV_TAG}) 
         run : az acr import -n ${REGISTRY} --source ${REGISTRY}/${REPOSITORY}:10b1ac5 --image ${REPOSITORY}:${GITHUB_SHA:1:7}
 
 
