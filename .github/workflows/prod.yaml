@@ -45,16 +45,17 @@ jobs:
         run: |
           echo $PROD_TAG
 
-      - name: Get the dev
+      - name: Get the dev commit 
         if: ${{ endsWith(github.ref, '/main') }}
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
-         echo "DEV_TAG= \
-           $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
-           awk '{print substr($0,2,7)}' | xargs)" \
+         echo "DEV_COMMIT= \
+           $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g')" \
            >> $GITHUB_ENV
-
+        
+      - name: Get Image Dev tag 
+        run : echo "DEV_TAG=$(echo ${DEV_COMMIT:1:7})" >> $GITHUB_ENV
     
       
       - name : check "DEV" Tag
