@@ -39,7 +39,7 @@ jobs:
            echo "DEV_COMMIT2= $(echo "$DEV_COMMIT")"
       
       - name : run 
-        run : echo ${DEV_COMMIT2}
+        run : echo $DEV_COMMIT2
 
 
 
