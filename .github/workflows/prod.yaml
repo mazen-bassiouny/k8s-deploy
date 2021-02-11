@@ -72,10 +72,46 @@ jobs:
       - name : List all tags in the ACR
         id : tags
         run : |
-          echo "::set-output name=tags::$(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY})"
-
-      - name : check if tag exists 
+          echo "::set-output name=TAGS::$(echo $(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY}))"
+         
+      - name : check tags
         run : |
-          echo ${{ steps.tags.outputs.tags }}
+          echo $TAGS
 
-      
+      - name : Set A new Tag for production image  
+       # if: contains(env.TAGS, '10b1ac5')
+        if: contains( ${{ steps.tags.outputs.TAGI }},${DEV_TAG}) 
+        run : az acr import -n ${REGISTRY} --source ${REGISTRY}/${REPOSITORY}:${DEV_TAG} --image ${REPOSITORY}:${PROD_TAG}
+
+
+  deploy:
+    name: Trigger Production Deployment
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ endsWith(github.ref, '/dev') || github.event.inputs.deploy == 'true' }}
+    steps:
+      - name: Generate Payload
+        id: set-post-options
+        run: |
+          echo "::set-output name=environment::$(echo 'production')"
+          echo "::set-output name=payload::$(echo ${PROD_PAYLOAD})"
+
+      - name: Create Deployment
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/:repository/deployments
+          repository: ${{ github.repository }}
+          mediaType: |
+            previews:
+              - flash
+          ref: ${{ github.sha }}
+          environment: production
+          payload: ${{ steps.set-post-options.outputs.payload }}
+          auto_merge: false
+          required_contexts: '["Build Tracktor"]'
+          description: Automatic deployment triggered from Pipeline
+        env:
+          GITHUB_TOKEN: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
+          # Needs a service user token because the normal GitHub Action token is not allowed to trigger other workflows:
+          # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#triggering-new-workflows-using-a-personal-access-token
+    
