@@ -28,12 +28,11 @@ jobs:
         run : | 
           echo "DEV_COMMIT= \
            $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
-           awk '{print substr($0,1,7)}')" \
            >> $GITHUB_ENV
 
       - name : check 
         run : echo $DEV_COMMIT
         
         
-
+#awk '{print substr($0,1,7)}')" \
       
