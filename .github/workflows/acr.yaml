@@ -45,7 +45,7 @@ jobs:
          
       - name : check if tag exists 
         run : |
-          echo ${toJson(TAGS)}
+          echo $TAGS.*
 
  ##echo "::set-output name=tags::$(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY})"
       
