@@ -39,7 +39,7 @@ jobs:
       - name: Generate Image Tags "prod"
         if: ${{ endsWith(github.ref, '/main') }}
         run: |
-          echo "PROD_TAG=$(echo ${GITHUB_SHA:0:6})" >> $GITHUB_ENV
+          echo "PROD_TAG=$(echo ${GITHUB_SHA:0:7})" >> $GITHUB_ENV
       # step to check .. to be removed.
       - name: check "prod" Tag
         run: |
