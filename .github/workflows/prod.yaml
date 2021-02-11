@@ -45,15 +45,17 @@ jobs:
         run: |
           echo $PROD_TAG
 
-      - name: Get the last tested and approved dev Tag 
+      - name: Get the dev
         if: ${{ endsWith(github.ref, '/main') }}
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
          echo "DEV_TAG= \
            $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
-           cut -c2-8)" \
+           awk '{print substr($0,1,7)}')" \
            >> $GITHUB_ENV
+
+    
       
       - name : check "DEV" Tag
         if: ${{ endsWith(github.ref, '/main') }}
