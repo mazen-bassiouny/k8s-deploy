@@ -36,35 +36,46 @@ jobs:
           key: ${{ secrets.CROSS_PULL_GIT_ACTIONS }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
-      - name: Generate Image Tags "dev"
-        if: ${{ endsWith(github.ref, '/dev') }}
+      - name: Generate Image Tags "prod"
+        if: ${{ endsWith(github.ref, '/main') }}
         run: |
-          echo "DEV_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
+          echo "PROD_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
       # step to check .. to be removed.
-      - name: check "dev" Tag
+      - name: check "prod" Tag
         if: ${{ endsWith(github.ref, '/dev') }}
         run: |
-          echo $Dev_TAG
-      # Call the Docker build script with the correct variables (depending on the branch name)
-      - name: Image Build and Push "dev"
-        if: ${{ endsWith(github.ref, '/dev') }}
-        run: |
-         bash .github/scripts/docker_build_and_push.sh
+          echo $PROD_TAG
 
-      - name: Get the last tested and approved Tag 
+      - name: Get the last tested and approved dev Tag 
         if: ${{ endsWith(github.ref, '/main') }}
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
-         echo "PROD_TAG= \
+         echo "DEV_TAG= \
            $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
            cut -c2-8)" \
            >> $GITHUB_ENV
       
-      - name : check "prod" Tag
+      - name : check "DEV" Tag
         if: ${{ endsWith(github.ref, '/main') }}
         run : | 
-          echo $PROD_TAG
+          echo $DEV
       
+      - name: Azure Login
+        env:
+          USER: ${{ secrets.AZURE_CLIENT_ID }}
+          SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          TENANT: ${{ secrets.AZURE_CLIENT_TENANT }}
+        run: |
+          az login --service-principal -u ${USER} -p ${SECRET} --tenant ${TENANT}
+          az account set --subscription="012901f9-e5ca-44a8-b241-f4a383710f91"
+      
+      - name : List all tags in the ACR
+        id : tags
+        run : |
+          echo "::set-output name=tags::$(echo 'az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY}')"
 
-  
+      - name : check if tag exists 
+      - run : echo ${{ steps.tags.outputs.tags }}
+
+      
