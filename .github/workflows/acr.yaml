@@ -30,7 +30,7 @@ jobs:
         run : | 
           echo "DEV_COMMIT= \
            $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
-           awk '{print substr($0,1,7)}' | xargs)" \
+           awk '{print substr($0,0,7)}' | xargs)" \
            >> $GITHUB_ENV
 
       - name : check 
