@@ -41,12 +41,12 @@ jobs:
       - name : List all tags in the ACR
         id : tags
         run : |
-          echo "::set-output name=tags::$(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY})"
+          echo "TAGS=$(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY})" >> $GITHUB_ENV
+         
       - name : check if tag exists 
         run : |
-          echo ${{ steps.tags.outputs.tags }}
+          echo $TAGS
 
-
+ ##echo "::set-output name=tags::$(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY})"
       
     
-      
