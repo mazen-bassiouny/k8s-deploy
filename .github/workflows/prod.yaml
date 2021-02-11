@@ -17,7 +17,7 @@ env:
   LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
   LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
   DEV_PAYLOAD: '{"registry": "bidmaindevk8sk8sreg573m.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "bid-main-dev-k8s-cluster-main-9wj4","resource_group": "bid-main-dev-k8s-rg-3gvs","release": "tracktor","namespace": "default","timeout": "10m"}'
-  PROD_PAYLOAD: '{"registry": "be0aks0registry.azurecr.io","repository": "be-tracktor","value_file": "./","cluster": "hihi","resource_group": "cool_name","release": "tracktor","namespace": "tracking","timeout": "10m"}'
+  PROD_PAYLOAD: '{"registry": "bidmaindevk8sk8sreg573m.azurecr.io","repository": "tracktor","value_file": "./helm/value-prod.yml","cluster": "bid-main-dev-k8s-cluster-main-9wj4","resource_group": "bid-main-dev-k8s-rg-3gvs","release": "tracktor","namespace": "default","timeout": "10m"}'
 
 jobs:
 
