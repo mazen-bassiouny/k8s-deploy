@@ -35,7 +35,7 @@ jobs:
         run : echo $DEV_COMMIT
       - name: yalla
         run : | 
-           echo "prefix=mazen" >> $GITHUB_ENV
+           echo "prefix= $(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id')" >> $GITHUB_ENV
       
       - name : run 
         run : echo $prefix
