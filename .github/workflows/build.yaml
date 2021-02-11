@@ -36,7 +36,7 @@ jobs:
 
       - name: Generate Image Tags "dev"
         run: |
-          echo "DEV_TAG=$(echo ${GITHUB_SHA:0:6})" >> $GITHUB_ENV
+          echo "DEV_TAG=$(echo ${GITHUB_SHA:0:7})" >> $GITHUB_ENV
       # step to check .. to be removed.
       - name: check "dev" Tag
         run: |
