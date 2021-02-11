@@ -48,7 +48,7 @@ jobs:
           echo $TAGS
       - name : check contain 
         if: contains(env.TAGS, '10b1ac5')
-        run : echo YUP 
+        run : az acr import -n ${REGISTRY} --source ${REGISTRY}/${REPOSITORY}:10b1ac5 --image ${REPOSITORY}:${GITHUB_SHA:1:7}
 
  ##echo "::set-output name=tags::$(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY})"
       
