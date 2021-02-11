@@ -1,4 +1,4 @@
-name: Container Build and Trigger Deploy ## comment#
+name: Prepare for production Deploy ## comment#
 on:
   push:
     branches:
@@ -76,6 +76,7 @@ jobs:
           echo "::set-output name=tags::$(echo 'az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY}')"
 
       - name : check if tag exists 
-      - run : echo ${{ steps.tags.outputs.tags }}
+        run : |
+          echo ${{ steps.tags.outputs.tags }}
 
       
