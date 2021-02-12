@@ -56,7 +56,7 @@ jobs:
           TENANT: ${{ secrets.AZURE_CLIENT_TENANT }}
         run: |
           az login --service-principal -u ${USER} -p ${SECRET} --tenant ${TENANT}
-          az account set --subscription=""
+          az account set --subscription="012901f9-e5ca-44a8-b241-f4a383710f91"
 
       - name: Docker Login
         run: |
