@@ -10,7 +10,7 @@ env:
   REPOSITORY: tracktor
   LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
   LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
- DEV_PAYLOAD: '{"registry": "mazenatefdevk8sk8sreg42h.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
+  DEV_PAYLOAD: '{"registry": "mazenatefdevk8sk8sreg42h.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
   PROD_PAYLOAD: '{"registry": "mazenatefdevk8sk8sreg42h.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
 
 jobs:
