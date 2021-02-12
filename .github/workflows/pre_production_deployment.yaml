@@ -3,12 +3,6 @@ on:
   push:
     branches:
       - main 
-  workflow_dispatch:
-    inputs:
-      deploy:
-        description: 'Trigger Deployment'
-        requiered: true
-        default: 'false'
 
 env:
   CODE_SRC_FOLDER: tracktor
