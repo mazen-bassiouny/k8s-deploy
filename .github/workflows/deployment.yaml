@@ -85,7 +85,7 @@ jobs:
         run: |
           helm upgrade --install --atomic --timeout ${TIMEOUT} \
             --set image.repository=${IMAGE_NAME},image.tag=${IMAGE_TAG} \
-            --namespace ${NAMESPACE} ${RELEASE} ./helm/tracktor
+            --namespace ${NAMESPACE} --create-namespace ${RELEASE} ./helm/tracktor
 
       - name: Set Deployment Status to success
         uses: octokit/request-action@v2.x
