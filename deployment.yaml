@@ -7,8 +7,8 @@ jobs:
     name: Deploy Tracktor
     runs-on: ubuntu-latest
     env:
-      REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
       ENVIRONMENT: ${{ github.event.deployment.environment }}
+      REGISTRY: ${{ github.event.deployment.payload.registry }}
       REPOSITORY: ${{ github.event.deployment.payload.repository }}
       VALUE_FILE: ${{ github.event.deployment.payload.value_file}}
       CLUSTER: ${{ github.event.deployment.payload.cluster }}
