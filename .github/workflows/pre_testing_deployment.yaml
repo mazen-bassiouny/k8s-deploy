@@ -14,7 +14,8 @@ env:
   CODE_SRC_FOLDER: tracktor
   REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
   REPOSITORY: tracktor
-  DEV_PAYLOAD: '{"repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
+  DEV_PAYLOAD: '{"registry": "mazenatefdevk8sk8sreg42h.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
+  PROD_PAYLOAD: '{"registry": "mazenatefdevk8sk8sreg42h.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
 
 jobs:
 
@@ -69,9 +70,8 @@ jobs:
             previews:
               - flash
           ref: ${{ github.sha }}
-          environment: testing
-          #payload: ${{ steps.set-post-options.outputs.payload }}
-          payload : ${DEV_PAYLOAD}
+          environment: ${{ steps.set-post-options.outputs.environment }}
+          payload: ${{ steps.set-post-options.outputs.payload }}
           auto_merge: false
           required_contexts: '["Build Tracktor"]'
           description: Automatic deployment triggered from Pipeline
