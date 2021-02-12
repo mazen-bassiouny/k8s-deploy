@@ -70,7 +70,7 @@ jobs:
             previews:
               - flash
           ref: ${{ github.sha }}
-          environment: ${{ steps.set-post-options.outputs.environment }}
+          environment: testing
           payload: ${{ steps.set-post-options.outputs.payload }}
           auto_merge: false
           required_contexts: '["Build Tracktor"]'

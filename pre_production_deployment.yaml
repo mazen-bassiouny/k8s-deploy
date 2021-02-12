@@ -1,19 +1,15 @@
-name: Container Build and Trigger Deploy ## comment
+name: Prepare for production Deploy ## comment#
 on:
   push:
     branches:
-      - dev
-  workflow_dispatch:
-    inputs:
-      deploy:
-        description: 'Trigger Deployment'
-        requiered: true
-        default: 'false'
+      - main 
 
 env:
   CODE_SRC_FOLDER: tracktor
   REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
   REPOSITORY: tracktor
+  LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
+  LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
   DEV_PAYLOAD: '{"registry": "mazenatefdevk8sk8sreg42h.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
   PROD_PAYLOAD: '{"registry": "mazenatefdevk8sk8sreg42h.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
 
@@ -34,32 +30,65 @@ jobs:
           key: ${{ secrets.CROSS_PULL_GIT_ACTIONS }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
-      - name: Generate Image Tags "dev"
+      - name: Generate Image Tags "prod"
+        if: ${{ endsWith(github.ref, '/main') }}
         run: |
-          echo "DEV_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
+          echo "PROD_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
       # step to check .. to be removed.
-      - name: check "dev" Tag
+      - name: check "prod" Tag
         run: |
-          echo $DEV_TAG
-      # Call the Docker build script with the correct variables (depending on the branch name)
-      - name: Image Build and Push "dev"
+          echo $PROD_TAG
+
+      - name: Get the dev commit 
+        if: ${{ endsWith(github.ref, '/main') }}
         env:
-          LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
-          LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
-         bash .github/scripts/docker_build_and_push.sh
+          echo "DEV_TAG=$(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
+            awk '{print substr($0,2,7)}' |sed 's/ //g')" \
+            >> $GITHUB_ENV
+        
+    
       
+      - name : check "DEV" Tag
+        if: ${{ endsWith(github.ref, '/main') }}
+        run : | 
+          echo $DEV_TAG
+      
+      - name: Azure Login
+        env:
+          USER: ${{ secrets.AZURE_CLIENT_ID }}
+          SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          TENANT: ${{ secrets.AZURE_CLIENT_TENANT }}
+        run: |
+          az login --service-principal -u ${USER} -p ${SECRET} --tenant ${TENANT}
+          az account set --subscription="012901f9-e5ca-44a8-b241-f4a383710f91"
+      
+      - name : List all tags in the ACR
+        id : tags
+        run : |
+          echo "::set-output name=TAGS::$(echo $(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY}))"
+         
+      - name : check tags
+        run : |
+          echo $TAGS
+
+      - name : Set A new Tag for production image  
+       # if: contains(env.TAGS, '10b1ac5')
+        if: contains( ${{ steps.tags.outputs.TAGI }},${DEV_TAG}) 
+        run : az acr import -n ${REGISTRY} --source ${REGISTRY}/${REPOSITORY}:${DEV_TAG} --image ${REPOSITORY}:${PROD_TAG}
+
+
   deploy:
-    name: Trigger Testing Deployment
+    name: Trigger Production Deployment
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ endsWith(github.ref, '/dev') || github.event.inputs.deploy == 'true' }}
     steps:
       - name: Generate Payload
         id: set-post-options
         run: |
-          echo "::set-output name=environment::$(echo 'testing')"
-          echo "::set-output name=payload::$(echo ${DEV_PAYLOAD})"
+          echo "::set-output name=environment::$(echo 'production')"
+          echo "::set-output name=payload::$(echo ${PROD_PAYLOAD})"
 
       - name: Create Deployment
         uses: octokit/request-action@v2.x
@@ -70,7 +99,7 @@ jobs:
             previews:
               - flash
           ref: ${{ github.sha }}
-          environment: ${{ steps.set-post-options.outputs.environment }}
+          environment: production
           payload: ${{ steps.set-post-options.outputs.payload }}
           auto_merge: false
           required_contexts: '["Build Tracktor"]'
@@ -79,3 +108,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
           # Needs a service user token because the normal GitHub Action token is not allowed to trigger other workflows:
           # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#triggering-new-workflows-using-a-personal-access-token
+    
