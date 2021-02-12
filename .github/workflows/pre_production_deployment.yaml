@@ -44,7 +44,7 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           echo "DEV_TAG=$(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
-            awk '{print substr($0,2,7)}' |sed 's/ //g')" \
+            awk '{print substr($0,2,7)}')" \
             >> $GITHUB_ENV
         
     
