@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
+      REPOSITORY: tracktor
       ENVIRONMENT: ${{ github.event.deployment.environment }}
-      REPOSITORY: ${{ github.event.deployment.payload.repository }}
       VALUE_FILE: ${{ github.event.deployment.payload.value_file}}
       CLUSTER: ${{ github.event.deployment.payload.cluster }}
       RESOURCE_GROUP: ${{ github.event.deployment.payload.resource_group }}
