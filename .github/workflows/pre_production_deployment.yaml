@@ -98,7 +98,8 @@ jobs:
           mediaType: |
             previews:
               - flash
-          ref: ${{ github.sha }}
+          #ref: ${{ github.sha }}
+          head_sha: ${{ github.sha }}
           environment: production
           payload: ${{ steps.set-post-options.outputs.payload }}
           auto_merge: false
