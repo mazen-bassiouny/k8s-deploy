@@ -10,7 +10,8 @@ env:
   REPOSITORY: tracktor
   LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
   LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-  PROD_PAYLOAD: '{repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "prod","timeout": "10m"}'
+  DEV_PAYLOAD: '{"registry": "mazenatefdevk8sk8sreg42h.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
+  PROD_PAYLOAD: '{"registry": "mazenatefdevk8sk8sreg42h.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
 
 jobs:
 
@@ -73,12 +74,9 @@ jobs:
           echo $TAGS
 
       - name : Set A new Tag for production image  
-        if: contains( ${{ steps.tags.outputs.TAGI }},${DEV_TAG}) && !contains( ${{ steps.tags.outputs.TAGI }},${PROD_TAG})
+       # if: contains(env.TAGS, '10b1ac5')
+        if: contains( ${{ steps.tags.outputs.TAGI }},${DEV_TAG}) 
         run : az acr import -n ${REGISTRY} --source ${REGISTRY}/${REPOSITORY}:${DEV_TAG} --image ${REPOSITORY}:${PROD_TAG}
-   
-      - name : if the production tag exist (That means Roll back case)
-        if:  contains( ${{ steps.tags.outputs.TAGI }},${PROD_TAG})
-
 
 
   deploy:
