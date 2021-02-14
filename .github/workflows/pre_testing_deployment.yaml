@@ -14,7 +14,7 @@ env:
   CODE_SRC_FOLDER: tracktor
   REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
   REPOSITORY: tracktor
-  DEV_PAYLOAD: '{"value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
+  DEV_PAYLOAD: '{"value_file": "./helm/values-dev.yaml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
 jobs:
 
   build:

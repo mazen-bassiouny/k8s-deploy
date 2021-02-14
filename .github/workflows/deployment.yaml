@@ -84,6 +84,7 @@ jobs:
       - name: Deploy
         run: |
           helm upgrade --install --atomic --timeout ${TIMEOUT} \
+            -f ${VALUE_FILE} \
             --set image.repository=${IMAGE_NAME},image.tag=${IMAGE_TAG} \
             --namespace ${NAMESPACE} --create-namespace ${RELEASE} ./helm/tracktor
 

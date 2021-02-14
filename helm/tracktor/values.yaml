@@ -4,3 +4,4 @@ title: "Welcome to Azure Kubernetes Service (AKS)"
 # Service controlls
 serviceName: aks-helloworld
 serviceType: ClusterIP
+replicaCount: 1
