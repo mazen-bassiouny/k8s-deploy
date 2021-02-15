@@ -5,7 +5,6 @@ on:
       - main 
 
 env:
-  CODE_SRC_FOLDER: tracktor
   REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
   REPOSITORY: tracktor
   LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
@@ -15,7 +14,7 @@ env:
 jobs:
 
   build:
-    name: Build Tracktor
+    name: Generate a production Image 
     runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: 1
@@ -101,7 +100,7 @@ jobs:
             previews:
               - flash
           ref: ${{ github.sha }}
-          environment: production
+          environment: ${{ steps.set-post-options.outputs.environment }}
           payload: ${{ steps.set-post-options.outputs.payload }}
           auto_merge: false
           required_contexts: '["Build Tracktor"]'
