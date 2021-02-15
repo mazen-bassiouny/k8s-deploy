@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2.2.0
+        with: 
+          fetch-depth: 0
 
       - name: Prepare SSH-Keys
         uses: shimataro/ssh-key-action@v2.0.3
