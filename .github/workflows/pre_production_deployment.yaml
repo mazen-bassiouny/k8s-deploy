@@ -103,7 +103,7 @@ jobs:
           environment: ${{ steps.set-post-options.outputs.environment }}
           payload: ${{ steps.set-post-options.outputs.payload }}
           auto_merge: false
-          required_contexts: '["Build Tracktor"]'
+          required_contexts: '["Generate a production Image "]'
           description: Automatic deployment triggered from Pipeline
         env:
           GITHUB_TOKEN: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
