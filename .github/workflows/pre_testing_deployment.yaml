@@ -2,7 +2,7 @@ name: Container Build and Trigger Deploy ## comment
 on:
   push:
     branches:
-      - devvv
+      - dev
   workflow_dispatch:
     inputs:
       deploy:
