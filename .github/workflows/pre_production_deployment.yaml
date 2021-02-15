@@ -2,7 +2,7 @@ name: Prepare for production Deploy ## comment#
 on:
   push:
     branches:
-      - main 
+      - mainnn
 
 env:
   REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
@@ -38,7 +38,6 @@ jobs:
           echo $PROD_TAG
 
       - name: Get the dev commit 
-        if: ${{ endsWith(github.ref, '/main') }}
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
@@ -61,6 +60,7 @@ jobs:
         run: |
           az login --service-principal -u ${USER} -p ${SECRET} --tenant ${TENANT}
           az account set --subscription="012901f9-e5ca-44a8-b241-f4a383710f91"
+      
       
       - name : List all tags in the ACR
         id : tags
