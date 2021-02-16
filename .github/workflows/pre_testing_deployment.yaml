@@ -22,9 +22,11 @@ env:
 jobs:
 
   test:
-    name : Test Tracktor
+    name: Test Tracktor
+    runs-on: ubuntu-latest
     steps:
-      - run : echo "hallo"
+      - name: Checkout
+        uses: actions/checkout@v2.2.0
 
   build:
     name: Build Tracktor
