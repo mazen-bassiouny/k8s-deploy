@@ -2,21 +2,19 @@ name: Prepare for production Deploy ## comment#
 on:
   push:
     branches:
-      - main 
+      - mainnn
 
 env:
-  CODE_SRC_FOLDER: tracktor
   REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
   REPOSITORY: tracktor
   LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
   LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-  DEV_PAYLOAD: '{"registry": "mazenatefdevk8sk8sreg42h.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
-  PROD_PAYLOAD: '{"registry": "mazenatefdevk8sk8sreg42h.azurecr.io","repository": "tracktor","value_file": "./helm/value-dev.yml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
+  PROD_PAYLOAD: '{"value_file": "./helm/values-prod.yaml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "prod","timeout": "10m"}'
 
 jobs:
 
   build:
-    name: Build Tracktor
+    name: Generate a production Image 
     runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: 1
@@ -40,12 +38,11 @@ jobs:
           echo $PROD_TAG
 
       - name: Get the dev commit 
-        if: ${{ endsWith(github.ref, '/main') }}
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           echo "DEV_TAG=$(echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1|sed 's/\"//g'| \
-            awk '{print substr($0,2,7)}' |sed 's/ //g')" \
+            awk '{print substr($0,2,7)}')" \
             >> $GITHUB_ENV
         
     
@@ -64,6 +61,7 @@ jobs:
           az login --service-principal -u ${USER} -p ${SECRET} --tenant ${TENANT}
           az account set --subscription="012901f9-e5ca-44a8-b241-f4a383710f91"
       
+      
       - name : List all tags in the ACR
         id : tags
         run : |
@@ -77,8 +75,8 @@ jobs:
         if: contains( ${{ steps.tags.outputs.TAGI }},${DEV_TAG}) && !contains( ${{ steps.tags.outputs.TAGI }},${PROD_TAG})
         run : az acr import -n ${REGISTRY} --source ${REGISTRY}/${REPOSITORY}:${DEV_TAG} --image ${REPOSITORY}:${PROD_TAG}
    
-      - name : if the production tag exist (That means Roll back case)
-        if:  contains( ${{ steps.tags.outputs.TAGI }},${PROD_TAG})
+      #- name : if the production tag exist (That means Roll back case)
+      #  if:  contains( ${{ steps.tags.outputs.TAGI }},${PROD_TAG})
 
 
 
@@ -102,10 +100,10 @@ jobs:
             previews:
               - flash
           ref: ${{ github.sha }}
-          environment: production
+          environment: ${{ steps.set-post-options.outputs.environment }}
           payload: ${{ steps.set-post-options.outputs.payload }}
           auto_merge: false
-          required_contexts: '["Build Tracktor"]'
+          required_contexts: '["Generate a production Image "]'
           description: Automatic deployment triggered from Pipeline
         env:
           GITHUB_TOKEN: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
