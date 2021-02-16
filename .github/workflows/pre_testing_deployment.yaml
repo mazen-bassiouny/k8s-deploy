@@ -43,6 +43,15 @@ jobs:
       - name: check "dev" Tag
         run: |
           echo ${{steps.dev_tag.outputs.DEV_TAG}}
+
+       - name: Azure Login (prod subscription) where ACR
+        env:
+          USER: ${{ secrets.AZURE_CLIENT_ID }}
+          SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          TENANT: ${{ secrets.AZURE_CLIENT_TENANT }}
+        run: |
+          az login --service-principal -u ${USER} -p ${SECRET} --tenant ${TENANT}
+          az account set --subscription="012901f9-e5ca-44a8-b241-f4a383710f91"
       
       - name : List all tags in the ACR
         id : tags
