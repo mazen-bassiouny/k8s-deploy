@@ -17,7 +17,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2.2.0
         with: 
+          ref: ${{ github.base_ref }}
           fetch-depth: 0
-      - name: Generate Image Tags "dev"
+      
+      - name: Merge commit 
         run: |
-          git log --all
+          git merge --no-ff origin/${{ github.head_ref }}
