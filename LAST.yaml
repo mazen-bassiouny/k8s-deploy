@@ -51,9 +51,8 @@ jobs:
           echo "IMAGE_NAME=$(echo ${REGISTRY}/${REPOSITORY})" >> $GITHUB_ENV
           echo "IMAGE_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
           echo "::set-output name=IMAGE_TAG::$(echo ${GITHUB_SHA:1:7})"
-      # step to check .. to be removed.
 
-      - name: Azure Login (prod subscription) where ACR 
+      - name: Azure Login (prod subscription)
         run: |
           az login --service-principal -u ${USER} -p ${SECRET} --tenant ${TENANT}
           az account set --subscription="012901f9-e5ca-44a8-b241-f4a383710f91"
@@ -82,9 +81,6 @@ jobs:
           route: POST /repos/:repository/deployments
           repository: ${{ github.repository }}
           ref: ${{ github.sha }}
-          #mediaType: |
-          #  previews:
-          #    - flash
           environment: ${{ steps.set-post-options.outputs.environment }}
           auto_merge: false
           required_contexts: '["Test Tracktor"]'
