@@ -82,9 +82,9 @@ jobs:
           route: POST /repos/:repository/deployments
           repository: ${{ github.repository }}
           ref: ${{ github.sha }}
-          mediaType: |
-            previews:
-              - flash
+          #mediaType: |
+          #  previews:
+          #    - flash
           environment: ${{ steps.set-post-options.outputs.environment }}
           auto_merge: false
           required_contexts: '["Test Tracktor"]'
@@ -98,9 +98,9 @@ jobs:
           route: POST /repos/:repository/deployments/:deployment_id/statuses
           repository: ${{ github.repository }}
           deployment_id: ${{ fromJson(steps.deployment.outputs.data).id }}
-          mediaType: |
-            previews:
-              - flash
+          #mediaType: |
+          #  previews:
+          #    - flash
           environment: ${{ steps.set-post-options.outputs.environment }}
           state: in_progress
           description: Started Deployment Pipeline
@@ -130,7 +130,7 @@ jobs:
       - name: Install helm
         uses: azure/setup-helm@v1
 
-      - name: Deploy to Dev 
+      - name: Deploy to Dev cluster
         if : ${{ endsWith(github.ref, '/dev') }}
         env : 
           VALUE_FILE: ./helm/values-dev.yaml
@@ -142,7 +142,7 @@ jobs:
             --set image.repository=${IMAGE_NAME},image.tag=${IMAGE_TAG} \
             --namespace ${NAMESPACE} --create-namespace ${RELEASE} ./helm/tracktor
 
-      - name: Deploy to Prod
+      - name: Deploy to Prod cluster 
         if : ${{ endsWith(github.ref, '/main') }}
         env : 
           VALUE_FILE: ./helm/values-prod.yaml
