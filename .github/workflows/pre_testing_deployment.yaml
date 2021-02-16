@@ -53,7 +53,8 @@ jobs:
           echo $TAGS
       
       - name : Build Image if it doesn't exist in repo  
-        if: !contains( ${{ steps.tags.outputs.TAGS }},${DEV_TAG}) 
+        #if: $contains(${{ steps.tags.outputs.TAGS }},${DEV_TAG}) 
+        if: ${{!contains(steps.tags.outputs.TAGS, DEV_TAG)}}
         env:
           LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
           LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
