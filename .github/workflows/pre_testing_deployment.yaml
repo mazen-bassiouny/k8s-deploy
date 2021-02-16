@@ -71,8 +71,8 @@ jobs:
         env:
           LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
           LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-       run: |
-         bash .github/scripts/docker_build_and_push.sh
+        run: |
+          bash .github/scripts/docker_build_and_push.sh
         
       
   deploy:
