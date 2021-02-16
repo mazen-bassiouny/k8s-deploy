@@ -19,6 +19,7 @@ jobs:
         with: 
           fetch-depth: 0
 
-      - name: git log 
-        run: git log --all
+      - name: Generate Image Tags "dev"
+        run: |
+          git log --all
           
