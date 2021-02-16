@@ -79,7 +79,7 @@ jobs:
             previews:
               - flash
           environment: ${{ steps.set-post-options.outputs.environment }}
-          #required_contexts: '[" "]'
+          context: ''
           description: Automatic deployment triggered from Pipeline
         env:
           GITHUB_TOKEN:  ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
