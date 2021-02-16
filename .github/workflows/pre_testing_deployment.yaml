@@ -63,14 +63,14 @@ jobs:
      #   run : |
      #     echo${{ toJson(steps.tags.outputs.TAGS) }}
       
-      - name : Build Image if it doesn't exist in repo  
-        #if: $contains(${{ steps.tags.outputs.TAGS }},${DEV_TAG}) 
-        if: ${{!contains(steps.tags.outputs.TAGS, steps.dev_tag.outputs.DEV_TAG)}}
-        env:
-          LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
-          LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        run: |
-         bash .github/scripts/docker_build_and_push.sh
+    #  - name : Build Image if it doesn't exist in repo  
+    #    #if: $contains(${{ steps.tags.outputs.TAGS }},${DEV_TAG}) 
+    #    if: ${{!contains(steps.tags.outputs.TAGS, steps.dev_tag.outputs.DEV_TAG)}}
+    #    env:
+    #      LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
+    #      LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+    #    run: |
+    #     bash .github/scripts/docker_build_and_push.sh
         
       
   deploy:
@@ -108,13 +108,13 @@ jobs:
           # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#triggering-new-workflows-using-a-personal-access-token
       
 
-      - run: "echo  ${{ toJson(steps.deployment.outputs) }}" 
+      - run: "echo  ${{ toJson(steps.deployment.outputs.data) }}" 
       - name: Set Deployment Status to in_progress
         uses: octokit/request-action@v2.x
         with:
           route: POST /repos/:repository/deployments/:deployment_id/statuses
           repository: ${{ github.repository }}
-          deployment_id: ${{ steps.deployment.outputs.deployment.id }}
+          deployment_id: ${{ steps.deployment.outputs.data.id }}
           mediaType: |
             previews:
               - flash
