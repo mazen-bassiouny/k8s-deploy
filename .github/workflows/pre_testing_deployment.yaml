@@ -61,9 +61,9 @@ jobs:
         run : |
           echo "::set-output name=TAGS::$(echo $(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY}))"
          
-      - name : check tags
-        run : |
-          echo${{ toJson(steps.tags.outputs.TAGS) }}
+      #- name : check tags
+      #  run : |
+      #    echo${{ toJson(steps.tags.outputs.TAGS) }}
       
       - name : Build Image if it doesn't exist in repo  
        #if: $contains(${{ steps.tags.outputs.TAGS }},${DEV_TAG}) 
