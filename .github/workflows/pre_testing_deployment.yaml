@@ -85,8 +85,7 @@ jobs:
           required_contexts: '["Build Tracktor"]'
           description: Automatic deployment triggered from Pipeline
         env:
-          GITHUB_TOKEN: ${{GITHUB_TOKEN }}
-  
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Set Deployment Status to in_progress
         uses: octokit/request-action@v2.x
