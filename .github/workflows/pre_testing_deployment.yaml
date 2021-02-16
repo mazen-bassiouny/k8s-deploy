@@ -62,12 +62,6 @@ jobs:
         run: |
           bash .github/scripts/docker_build_and_push.sh
         
-      
-  deploy:
-    name: Trigger Deployment
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
       - name: Generate Payload
         id: set-post-options
         env:
@@ -85,7 +79,7 @@ jobs:
             previews:
               - flash
           environment: ${{ steps.set-post-options.outputs.environment }}
-          required_contexts: '["Build Tracktor"]'
+          required_contexts: '[""]'
           description: Automatic deployment triggered from Pipeline
         env:
           GITHUB_TOKEN:  ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
