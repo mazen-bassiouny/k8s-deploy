@@ -21,6 +21,10 @@ env:
   #PROD_PAYLOAD: '{"value_file": "./helm/values-prod.yaml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "prod","timeout": "10m"}'
 jobs:
 
+  test:
+    name : Test Tracktor
+    run : echo "hallo"
+
   build:
     name: Build Tracktor
     runs-on: ubuntu-latest
@@ -79,7 +83,8 @@ jobs:
             previews:
               - flash
           environment: ${{ steps.set-post-options.outputs.environment }}
-          required_contexts: ""
+          auto_merge: false
+          required_contexts: '["Test Tracktor"]'
           description: Automatic deployment triggered from Pipeline
         env:
           GITHUB_TOKEN:  ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
