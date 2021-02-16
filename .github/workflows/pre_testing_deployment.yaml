@@ -38,6 +38,7 @@ jobs:
       - name: Generate Image Tags "dev"
         id : dev_tag
         run: |
+          echo "DEV_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
           echo "::set-output name=DEV_TAG::$(echo ${GITHUB_SHA:1:7})"
       # step to check .. to be removed.
       - name: check "dev" Tag
@@ -60,7 +61,7 @@ jobs:
          
       - name : check tags
         run : |
-          echo $TAGS
+          echo${{ toJson(steps.tags.outputs.TAGS) }}
       
       - name : Build Image if it doesn't exist in repo  
         #if: $contains(${{ steps.tags.outputs.TAGS }},${DEV_TAG}) 
