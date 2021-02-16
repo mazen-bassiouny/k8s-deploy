@@ -22,4 +22,4 @@ jobs:
       
       - name: Merge commit 
         run: |
-          git merge --no-ff origin/${{ github.head_ref }}
+          MERGE_ID=$(git rev-parse HEAD^@ | cut -c 1-7 | sort | tr "\n" "_")
