@@ -151,12 +151,10 @@ jobs:
           NAMESPACE: prod
           RELEASE:  tracktor
         run: |
-          helm upgrade --install --atomic --timeout 10m \
+          helm upgrade --install --atomic --timeout ${TIMEOUT} \
             -f ${VALUE_FILE} \
             --set image.repository=${IMAGE_NAME},image.tag=${IMAGE_TAG} \
-            --namespace {NAMESPACE} \
-            --create-namespace \
-            ${RELEASE} ./helm/tracktor
+            --namespace ${NAMESPACE} --create-namespace ${RELEASE} ./helm/tracktor
 
       - name: Set Deployment Status to success
         uses: octokit/request-action@v2.x
