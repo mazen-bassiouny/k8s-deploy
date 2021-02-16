@@ -42,7 +42,10 @@ jobs:
           echo "::set-output name=DEV_TAG::$(echo ${GITHUB_SHA:1:7})"
       # step to check .. to be removed.
 
-      - run : echo "::set-output name=TEST_TAG::$(echo "1234567")"
+      - run : echo "::set-output name=TEST_TAG::$(echo 91353d9)"
+        id : test
+      - name : checkii 
+        run : echo ${{steps.test.outputs.TEST_TAG}}
       - name: check "dev" Tag
         run: |
           echo ${{steps.dev_tag.outputs.DEV_TAG}}
