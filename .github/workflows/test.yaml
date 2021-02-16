@@ -2,7 +2,7 @@ name: Prepare for production Deploy ## comment#
 on:
   push:
     branches:
-      - devvv
+      - dev
 
 env:
   REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
@@ -20,4 +20,4 @@ jobs:
           fetch-depth: 0
       - name: Generate Image Tags "dev"
         run: |
-          echo "DEV_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
+          git log --all
