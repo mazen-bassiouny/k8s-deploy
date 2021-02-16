@@ -107,6 +107,8 @@ jobs:
           # Needs a service user token because the normal GitHub Action token is not allowed to trigger other workflows:
           # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#triggering-new-workflows-using-a-personal-access-token
       
+
+      - run: "echo latest release: ${{ steps.deployment.outputs.data }}"
       - name: Set Deployment Status to in_progress
         uses: octokit/request-action@v2.x
         with:
