@@ -114,7 +114,7 @@ jobs:
         with:
           route: POST /repos/:repository/deployments/:deployment_id/statuses
           repository: ${{ github.repository }}
-          deployment_id: ${{ steps.deployment.outputs.data.id }}
+          deployment_id: echo ${{ steps.deployment.outputs.data.id }}
           mediaType: |
             previews:
               - flash
