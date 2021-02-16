@@ -99,7 +99,7 @@ jobs:
           description: Started Deployment Pipeline
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: AKS Login (dev)
         if : ${{ endsWith(github.ref, '/dev') }}
