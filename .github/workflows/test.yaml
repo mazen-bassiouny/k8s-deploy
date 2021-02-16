@@ -21,5 +21,4 @@ jobs:
 
       - name: Generate Image Tags "dev"
         run: |
-         echo "hello"
-          
+          echo "hello"
