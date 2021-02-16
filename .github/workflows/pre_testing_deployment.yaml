@@ -44,7 +44,7 @@ jobs:
         run: |
           echo ${{steps.dev_tag.outputs.DEV_TAG}}
 
-       - name: Azure Login (prod subscription) where ACR
+      - name: Azure Login (prod subscription) where ACR
         env:
           USER: ${{ secrets.AZURE_CLIENT_ID }}
           SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
