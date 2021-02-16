@@ -20,4 +20,5 @@ jobs:
           fetch-depth: 0
 
       - name : git log 
-        run : git log --all 
+        run : |
+          git log --all 
