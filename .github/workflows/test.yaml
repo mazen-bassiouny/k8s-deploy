@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2.2.0
-         with: 
+        with: 
           fetch-depth: 0
 
       - name : git log 
