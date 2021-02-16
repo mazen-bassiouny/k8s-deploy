@@ -23,3 +23,6 @@ jobs:
       - name: Merge commit 
         run: |
           echo "MERGE_ID=$(git rev-parse HEAD^@ | cut -c 1-7 | sort | tr "\n" "_")" >> $GITHUB_ENV
+
+      - name : test
+        run : echo "hello "
