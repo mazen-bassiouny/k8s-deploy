@@ -65,7 +65,7 @@ jobs:
     name: Trigger Deployment
     runs-on: ubuntu-latest
     needs: build
-     if: ${{ endsWith(github.ref, '/master') ||  endsWith(github.ref, '/dev') || github.event.inputs.deploy == 'true' }}
+    if: ${{ endsWith(github.ref, '/master') ||  endsWith(github.ref, '/dev') || github.event.inputs.deploy == 'true' }}
     steps:
       - name: Generate Payload
         id: set-post-options
@@ -110,4 +110,4 @@ jobs:
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
