@@ -19,6 +19,6 @@ jobs:
         with: 
           fetch-depth: 0
 
-      - name : git log 
-        run : |
-          echo "git log --all" 
+      - name: git log 
+        run: git log --all
+          
