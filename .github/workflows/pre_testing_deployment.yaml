@@ -28,8 +28,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2.2.0
 
-  build:
-    name: Build Tracktor
+  deploy:
+    name: Build and Deploy Tracktor
     runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: 1
@@ -134,7 +134,7 @@ jobs:
         if : ${{ endsWith(github.ref, '/dev') }}
         env : 
           VALUE_FILE: ./helm/values-dev.yaml
-          NAMESPACE: default
+          NAMESPACE: dev
           RELEASE: tracktor
         run: |
           helm upgrade --install --atomic --timeout 10m \
