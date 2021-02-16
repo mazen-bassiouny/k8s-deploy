@@ -23,7 +23,8 @@ jobs:
 
   test:
     name : Test Tracktor
-    run : echo "hallo"
+    steps:
+      - run : echo "hallo"
 
   build:
     name: Build Tracktor
