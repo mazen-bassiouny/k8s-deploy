@@ -41,6 +41,8 @@ jobs:
           echo "DEV_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
           echo "::set-output name=DEV_TAG::$(echo ${GITHUB_SHA:1:7})"
       # step to check .. to be removed.
+
+      - run : echo "::set-output name=TEST_TAG::$(echo "1234567")"
       - name: check "dev" Tag
         run: |
           echo ${{steps.dev_tag.outputs.DEV_TAG}}
@@ -59,18 +61,18 @@ jobs:
         run : |
           echo "::set-output name=TAGS::$(echo $(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY}))"
          
-     # - name : check tags
-     #   run : |
-     #     echo${{ toJson(steps.tags.outputs.TAGS) }}
+      - name : check tags
+        run : |
+          echo${{ toJson(steps.tags.outputs.TAGS) }}
       
-    #  - name : Build Image if it doesn't exist in repo  
-    #    #if: $contains(${{ steps.tags.outputs.TAGS }},${DEV_TAG}) 
-    #    if: ${{!contains(steps.tags.outputs.TAGS, steps.dev_tag.outputs.DEV_TAG)}}
-    #    env:
-    #      LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
-    #      LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-    #    run: |
-    #     bash .github/scripts/docker_build_and_push.sh
+      - name : Build Image if it doesn't exist in repo  
+       #if: $contains(${{ steps.tags.outputs.TAGS }},${DEV_TAG}) 
+        if: ${{!contains(steps.tags.outputs.TAGS, steps.dev_tag.outputs.TEST_TAG)}}
+        env:
+          LOGIN_USER: ${{ secrets.AZURE_CLIENT_ID }}
+          LOGIN_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+       run: |
+         bash .github/scripts/docker_build_and_push.sh
         
       
   deploy:
@@ -107,8 +109,6 @@ jobs:
           # Needs a service user token because the normal GitHub Action token is not allowed to trigger other workflows:
           # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#triggering-new-workflows-using-a-personal-access-token
       
-
-      - run: "echo  ${{ toJson(steps.deployment.outputs.data) }}" 
       - name: Set Deployment Status to in_progress
         uses: octokit/request-action@v2.x
         with:
