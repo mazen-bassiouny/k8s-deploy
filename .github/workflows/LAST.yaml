@@ -125,7 +125,7 @@ jobs:
           NAMESPACE: prod
           RELEASE:  tracktor
         run: |
-          helm upgrade --install --atomic --timeout ${TIMEOUT} \
+          helm upgrade --install --atomic --timeout 10m \
             -f ${VALUE_FILE} \
             --set image.tag=${TREE_TAG} \
             --namespace ${NAMESPACE} --create-namespace ${RELEASE} ./helm/tracktor
