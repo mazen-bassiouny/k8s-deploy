@@ -81,7 +81,7 @@ jobs:
           required_contexts: '["Test Tracktor"]'
           description: Automatic deployment triggered from Pipeline
         env:
-          GITHUB_TOKEN:  ${{ secrets._GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
 
       - name: AKS Login (dev)
         if : ${{ endsWith(github.ref, '/dev') }}
