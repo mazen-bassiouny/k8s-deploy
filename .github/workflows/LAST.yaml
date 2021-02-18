@@ -34,11 +34,11 @@ jobs:
         with: 
           fetch-depth: 0
 
-      - name: Prepare SSH-Keys
-        uses: shimataro/ssh-key-action@v2.0.3
-        with:
-          key: ${{ secrets.CROSS_PULL_GIT_ACTIONS }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+      #- name: Prepare SSH-Keys
+      #  uses: shimataro/ssh-key-action@v2.0.3
+      #  with:
+      #    key: ${{ secrets.CROSS_PULL_GIT_ACTIONS }}
+      #    known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
       - name: Set  Image Name and Tag 
         id : image
