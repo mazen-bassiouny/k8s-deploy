@@ -29,8 +29,4 @@ jobs:
         with:
           key: ${{ secrets.CROSS_PULL_GIT_ACTIONS }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
-
-      - name : git log 
-        run : 
-
       

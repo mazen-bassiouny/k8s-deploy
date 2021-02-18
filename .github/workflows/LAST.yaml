@@ -2,13 +2,8 @@ name: Container Build and Trigger Deploy ## comment
 on:
   push:
     branches:
-      - dev
-  workflow_dispatch:
-    inputs:
-      deploy:
-        description: 'Trigger Deployment'
-        requiered: true
-        default: 'false'
+      - devv
+      - mainn
 
 env:
   CODE_SRC_FOLDER: tracktor
@@ -48,9 +43,9 @@ jobs:
       - name: Set  Image Name and Tag 
         id : image
         run: |
-          echo "IMAGE_NAME=$(echo ${REGISTRY}/${REPOSITORY})" >> $GITHUB_ENV
-          echo "IMAGE_TAG=$(echo ${GITHUB_SHA:1:7})" >> $GITHUB_ENV
-          echo "::set-output name=IMAGE_TAG::$(echo ${GITHUB_SHA:1:7})"
+          echo "COMMIT_TAG=$(echo ${GITHUB_SHA:0:7})" >> $GITHUB_ENV
+          echo "::set-output name=COMMIT_TAG::$(echo ${GITHUB_SHA:1:7})"
+          echo "::set-output name=TREE_TAG::$(git show --quiet --format=format:'%T' | cut -c 1-7)"
 
       - name: Azure Login (prod subscription)
         run: |
@@ -63,8 +58,8 @@ jobs:
           echo "::set-output name=TAGS::$(echo $(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY}))"
          
 
-      - name : Build Image if it doesn't exist in ACR  
-        if: ${{!contains(steps.tags.outputs.TAGS, steps.image.outputs.IMAGE_TAG)}}
+      - name : Build and push Image if it doesn't exist in ACR  
+        if: ${{!contains(steps.tags.outputs.TAGS, steps.image.outputs.TREE_TAG)}}
         run: |
           bash .github/scripts/docker_build_and_push.sh
         
@@ -86,7 +81,7 @@ jobs:
           required_contexts: '["Test Tracktor"]'
           description: Automatic deployment triggered from Pipeline
         env:
-          GITHUB_TOKEN:  ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
+          GITHUB_TOKEN:  ${{ secrets._GITHUB_TOKEN }}
 
       - name: AKS Login (dev)
         if : ${{ endsWith(github.ref, '/dev') }}
@@ -116,10 +111,11 @@ jobs:
           VALUE_FILE: ./helm/values-dev.yaml
           NAMESPACE: dev
           RELEASE: tracktor
+          ##--set image.repository=${IMAGE_NAME},image.tag=${IMAGE_TAG} \
         run: |
           helm upgrade --install --atomic --timeout 10m \
             -f ${VALUE_FILE} \
-            --set image.repository=${IMAGE_NAME},image.tag=${IMAGE_TAG} \
+            --set image.tag=${TREE_TAG} \
             --namespace ${NAMESPACE} --create-namespace ${RELEASE} ./helm/tracktor
 
       - name: Deploy to Prod cluster 
@@ -131,7 +127,7 @@ jobs:
         run: |
           helm upgrade --install --atomic --timeout ${TIMEOUT} \
             -f ${VALUE_FILE} \
-            --set image.repository=${IMAGE_NAME},image.tag=${IMAGE_TAG} \
+            --set image.tag=${TREE_TAG} \
             --namespace ${NAMESPACE} --create-namespace ${RELEASE} ./helm/tracktor
 
       - name: Set Deployment Status to success
