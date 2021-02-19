@@ -51,9 +51,6 @@ jobs:
         run : echo "TEST_TAG=$(git tag ${TREE_TAG})" >> $GITHUB_ENV
                
 
-      - name : test tag
-        run : git tag ${TREE_TAG}
-
       - name: Azure Login (prod subscription)
         run: |
           az login --service-principal -u ${USER} -p ${SECRET} --tenant ${TENANT}
