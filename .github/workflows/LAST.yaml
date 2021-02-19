@@ -49,7 +49,7 @@ jobs:
 
       - name : Tag the commit with its tree tag 
         run : |
-          git tag ${TREE_TAG})
+          git tag ${TREE_TAG}
           git push --tag
                
 
