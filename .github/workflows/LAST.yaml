@@ -48,7 +48,7 @@ jobs:
           echo "::set-output name=TREE_TAG::$(git show --quiet --format=format:'%T' | cut -c 1-7)"
 
       - name : Tag the commit with its tree tag 
-        run : git tag tree.${TREE_TAG}
+        run : git tag ${TREE_TAG}
 
       - name: Azure Login (prod subscription)
         run: |
