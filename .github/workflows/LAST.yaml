@@ -34,11 +34,11 @@ jobs:
         with: 
           fetch-depth: 0
 
-      #- name: Prepare SSH-Keys
-      #  uses: shimataro/ssh-key-action@v2.0.3
-      #  with:
-      #    key: ${{ secrets.CROSS_PULL_GIT_ACTIONS }}
-      #    known_hosts: ${{ secrets.KNOWN_HOSTS }}
+      - name: Prepare SSH-Keys
+        uses: shimataro/ssh-key-action@v2.0.3
+        with:
+          key: ${{ secrets.CROSS_PULL_GIT_ACTIONS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
       - name: Set  Image Name and Tag 
         id : image
@@ -46,6 +46,10 @@ jobs:
           echo "COMMIT_TAG=$(echo ${GITHUB_SHA:0:7})" >> $GITHUB_ENV
           echo "TREE_TAG=$(git show --quiet --format=format:'%T' | cut -c 1-7)" >> $GITHUB_ENV
           echo "::set-output name=TREE_TAG::$(git show --quiet --format=format:'%T' | cut -c 1-7)"
+
+      - name : Tag the commit with its tree tag 
+        run : echo "TEST_TAG=$(git tag ${TREE_TAG})" >> $GITHUB_ENV
+               
 
       - name: Azure Login (prod subscription)
         run: |
