@@ -6,5 +6,5 @@ serviceName: aks-helloworld
 serviceType: ClusterIP
 replicaCount: 1
 image:
-  repository: "mazenatefdevk8sk8sreg42h.azurecr.io/tracktor"
+  repository: "bassiounycbcdevk8sacr5e2.azurecr.io/tracktor"
   tag: latest
