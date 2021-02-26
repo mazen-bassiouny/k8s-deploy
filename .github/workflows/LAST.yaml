@@ -7,7 +7,7 @@ on:
 
 env:
   CODE_SRC_FOLDER: tracktor
-  REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
+  REGISTRY: bassiounycbcdevk8sacr5e2.azurecr.io
   REPOSITORY: tracktor
   USER: ${{ secrets.AZURE_CLIENT_ID }}
   SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -92,16 +92,16 @@ jobs:
       - name: AKS Login (dev)
         if : ${{ endsWith(github.ref, '/dev') }}
         env : 
-          RESOURCE_GROUP: mazen-atef-dev-k8s-rg-51gx
-          CLUSTER: mazen-atef-dev-k8s-cluster-main-x0l6
+          RESOURCE_GROUP: bassiouny-cbc-dev-k8s-rg-o338
+          CLUSTER: bassiouny-cbc-dev-k8s-aks-main-2muy
         run: |
           az aks get-credentials --resource-group ${RESOURCE_GROUP} --name ${CLUSTER}
 
       - name: AKS Login (PROD)
         if : ${{ endsWith(github.ref, '/main') }}
         env : 
-          RESOURCE_GROUP: mazen-atef-dev-k8s-rg-51gx
-          CLUSTER: mazen-atef-dev-k8s-cluster-main-x0l6
+          RESOURCE_GROUP: bassiouny-cbc-dev-k8s-rg-o338
+          CLUSTER: bassiouny-cbc-dev-k8s-aks-main-2muy
         run: |
           az aks get-credentials --resource-group ${RESOURCE_GROUP} --name ${CLUSTER}
       
@@ -115,7 +115,7 @@ jobs:
         if : ${{ endsWith(github.ref, '/dev') }}
         env : 
           VALUE_FILE: ./helm/values-dev.yaml
-          NAMESPACE: dev
+          NAMESPACE: test
           RELEASE: tracktor
           ##--set image.repository=${IMAGE_NAME},image.tag=${IMAGE_TAG} \
         run: |
@@ -128,7 +128,7 @@ jobs:
         if : ${{ endsWith(github.ref, '/main') }}
         env : 
           VALUE_FILE: ./helm/values-prod.yaml
-          NAMESPACE: prod
+          NAMESPACE: stage
           RELEASE:  tracktor
         run: |
           helm upgrade --install --atomic --timeout 10m \
