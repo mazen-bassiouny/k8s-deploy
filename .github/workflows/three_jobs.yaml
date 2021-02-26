@@ -1,0 +1,208 @@
+name: Container Build and Trigger Deploy ## comment
+on:
+  push:
+    branches:
+      - dev
+      - main
+
+env:
+  CODE_SRC_FOLDER: tracktor
+  REGISTRY: bassiounycbcdevk8sacr5e2.azurecr.io
+  REPOSITORY: tracktor
+  USER: ${{ secrets.AZURE_CLIENT_ID }}
+  SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  TENANT: ${{ secrets.AZURE_CLIENT_TENANT }}
+  #DEV_PAYLOAD: '{"value_file": "./helm/values-dev.yaml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
+  #PROD_PAYLOAD: '{"value_file": "./helm/values-prod.yaml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "prod","timeout": "10m"}'
+jobs:
+
+  test:
+    name: Test Tracktor
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.2.0
+
+  build:
+    name: Build Tracktor
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.2.0
+        with: 
+          fetch-depth: 0
+
+      - name: Prepare SSH-Keys
+        uses: shimataro/ssh-key-action@v2.0.3
+        with:
+          key: ${{ secrets.CROSS_PULL_GIT_ACTIONS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: Set  Image Name and Tag 
+        id : image
+        run: |
+          echo "COMMIT_TAG=$(echo ${GITHUB_SHA:0:7})" >> $GITHUB_ENV
+          echo "TREE_TAG=$(git show --quiet --format=format:'%T' | cut -c 1-7)" >> $GITHUB_ENV
+          echo "::set-output name=TREE_TAG::$(git show --quiet --format=format:'%T' | cut -c 1-7)"
+
+      - name : Tag the commit ("branch"-"tree_tag") 
+        run : |
+          git tag  ${GITHUB_REF#refs/heads/}-${TREE_TAG}
+          git push --tag
+               
+
+      - name: Azure Login (prod subscription)
+        run: |
+          az login --service-principal -u ${USER} -p ${SECRET} --tenant ${TENANT}
+          az account set --subscription="012901f9-e5ca-44a8-b241-f4a383710f91"
+      
+      - name : List all tags in the ACR
+        id : tags
+        run : |
+          echo "::set-output name=TAGS::$(echo $(az acr repository show-tags --name ${REGISTRY} --repository ${REPOSITORY}))"
+         
+
+      - name : Build and push Image if it doesn't exist in ACR  
+        if: ${{!contains(steps.tags.outputs.TAGS, steps.image.outputs.TREE_TAG)}}
+        run: |
+          bash .github/scripts/docker_build_and_push.sh
+        
+  
+  deploy:
+    name: Deploy Tracktor
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      DOCKER: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.2.0    
+  
+      - name: Generate Payload
+        id: set-post-options
+        env:
+          PROD: ${{ endsWith(github.ref, '/main') }}
+        run: |
+          echo "::set-output name=environment::$(if ${PROD}; then echo 'production'; else echo 'testing'; fi)"
+      
+      - name: Create Deployment
+        id : deployment
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/:repository/deployments
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          mediaType: |
+            previews:
+              - flash
+          environment: ${{ steps.set-post-options.outputs.environment }}
+          auto_merge: false
+          required_contexts: '["Test Tracktor", "Build Tracktor"]'
+          description: Automatic deployment triggered from Pipeline
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      
+      - name: Azure Login (dev subscription)
+        if: ${{ steps.set-post-options.outputs.environment == 'testing' }}
+        run: |
+          az login --service-principal -u ${USER} -p ${SECRET} --tenant ${TENANT}
+          az account set --subscription="012901f9-e5ca-44a8-b241-f4a383710f91"
+
+      - name: Azure Login (prod subscription)
+        if: ${{ steps.set-post-options.outputs.environment == 'production' }}
+        run: |
+          az login --service-principal -u ${USER} -p ${SECRET} --tenant ${TENANT}
+          az account set --subscription="012901f9-e5ca-44a8-b241-f4a383710f91"
+
+      - name: AKS Login (dev)
+        if : ${{ endsWith(github.ref, '/dev') }}
+        env : 
+          RESOURCE_GROUP: bassiouny-cbc-dev-k8s-rg-o338
+          CLUSTER: bassiouny-cbc-dev-k8s-aks-main-2muy
+        run: |
+          az aks get-credentials --resource-group ${RESOURCE_GROUP} --name ${CLUSTER}
+
+      - name: AKS Login (PROD)
+        if : ${{ endsWith(github.ref, '/main') }}
+        env : 
+          RESOURCE_GROUP: bassiouny-cbc-dev-k8s-rg-o338
+          CLUSTER: bassiouny-cbc-dev-k8s-aks-main-2muy
+        run: |
+          az aks get-credentials --resource-group ${RESOURCE_GROUP} --name ${CLUSTER}
+      
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v1
+
+      - name: Install helm
+        uses: azure/setup-helm@v1
+
+      - name : get tree tag 
+        run : echo "TREE_TAG=$(git show --quiet --format=format:'%T' | cut -c 1-7)" >> $GITHUB_ENV
+
+      - name: Deploy to Dev cluster
+        if : ${{ endsWith(github.ref, '/dev') }}
+        env : 
+          VALUE_FILE: ./helm/values-dev.yaml
+          NAMESPACE: test
+          RELEASE: tracktor
+          ##--set image.repository=${IMAGE_NAME},image.tag=${IMAGE_TAG} \
+        run: |
+          helm upgrade --install --atomic --timeout 10m \
+            -f ${VALUE_FILE} \
+            --set image.tag=${TREE_TAG} \
+            --namespace ${NAMESPACE} --create-namespace ${RELEASE} ./helm/tracktor
+
+      - name: Deploy to Prod cluster 
+        if : ${{ endsWith(github.ref, '/main') }}
+        env : 
+          VALUE_FILE: ./helm/values-prod.yaml
+          NAMESPACE: stage
+          RELEASE:  tracktor
+        run: |
+          helm upgrade --install --atomic --timeout 10m \
+            -f ${VALUE_FILE} \
+            --set image.tag=${TREE_TAG} \
+            --namespace ${NAMESPACE} --create-namespace ${RELEASE} ./helm/tracktor
+
+      - name: Set Deployment Status to success
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/:repository/deployments/:deployment_id/statuses
+          repository: ${{ github.repository }}
+          deployment_id: ${{ fromJson(steps.deployment.outputs.data).id }}
+          mediaType: |
+            previews:
+              - flash
+          environment: ${{ steps.set-post-options.outputs.environment }}
+          state: success
+          description: Deployment finished succesfully
+          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set Deployment Status to failure
+        uses: octokit/request-action@v2.x
+        if: ${{ failure() }}
+        with:
+          route: POST /repos/:repository/deployments/:deployment_id/statuses
+          repository: ${{ github.repository }}
+          deployment_id: ${{ fromJson(steps.deployment.outputs.data).id }}
+          mediaType: |
+            previews:
+              - flash
+          environment: ${{ steps.set-post-options.outputs.environment }}
+          state: failure
+          description: The deployment failed
+          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}      
+
+        
+    
+    
+
+
+      
+
