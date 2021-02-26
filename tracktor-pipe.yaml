@@ -2,18 +2,16 @@ name: Container Build and Trigger Deploy ## comment
 on:
   push:
     branches:
-      - dev
-      - main
+      - devv
+      - mainn
 
 env:
   CODE_SRC_FOLDER: tracktor
-  REGISTRY: bassiounycbcdevk8sacr5e2.azurecr.io
+  REGISTRY: mazenatefdevk8sk8sreg42h.azurecr.io
   REPOSITORY: tracktor
   USER: ${{ secrets.AZURE_CLIENT_ID }}
   SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
   TENANT: ${{ secrets.AZURE_CLIENT_TENANT }}
-  #DEV_PAYLOAD: '{"value_file": "./helm/values-dev.yaml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "default","timeout": "10m"}'
-  #PROD_PAYLOAD: '{"value_file": "./helm/values-prod.yaml","cluster": "mazen-atef-dev-k8s-cluster-main-x0l6","resource_group": "mazen-atef-dev-k8s-rg-51gx","release": "tracktor","namespace": "prod","timeout": "10m"}'
 jobs:
 
   test:
@@ -23,6 +21,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2.2.0
 
+      - name: Prepare SSH-Keys
+        uses: shimataro/ssh-key-action@v2.0.3
+        with:
+          key: ${{ secrets.CROSS_PULL_GIT_ACTIONS }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Test with pytest
+        run: |
+          pytest --cov-report term-missing --cov=${CODE_SRC_FOLDER} -vv
+
+
   deploy:
     name: Build and Deploy Tracktor
     runs-on: ubuntu-latest
@@ -31,8 +49,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2.2.0
-        with: 
-          fetch-depth: 0
 
       - name: Prepare SSH-Keys
         uses: shimataro/ssh-key-action@v2.0.3
@@ -92,16 +108,16 @@ jobs:
       - name: AKS Login (dev)
         if : ${{ endsWith(github.ref, '/dev') }}
         env : 
-          RESOURCE_GROUP: bassiouny-cbc-dev-k8s-rg-o338
-          CLUSTER: bassiouny-cbc-dev-k8s-aks-main-2muy
+          RESOURCE_GROUP: mazen-atef-dev-k8s-rg-51gx
+          CLUSTER: mazen-atef-dev-k8s-cluster-main-x0l6
         run: |
           az aks get-credentials --resource-group ${RESOURCE_GROUP} --name ${CLUSTER}
 
       - name: AKS Login (PROD)
         if : ${{ endsWith(github.ref, '/main') }}
         env : 
-          RESOURCE_GROUP: bassiouny-cbc-dev-k8s-rg-o338
-          CLUSTER: bassiouny-cbc-dev-k8s-aks-main-2muy
+          RESOURCE_GROUP: mazen-atef-dev-k8s-rg-51gx
+          CLUSTER: mazen-atef-dev-k8s-cluster-main-x0l6
         run: |
           az aks get-credentials --resource-group ${RESOURCE_GROUP} --name ${CLUSTER}
       
@@ -115,7 +131,7 @@ jobs:
         if : ${{ endsWith(github.ref, '/dev') }}
         env : 
           VALUE_FILE: ./helm/values-dev.yaml
-          NAMESPACE: test
+          NAMESPACE: dev
           RELEASE: tracktor
           ##--set image.repository=${IMAGE_NAME},image.tag=${IMAGE_TAG} \
         run: |
@@ -128,7 +144,7 @@ jobs:
         if : ${{ endsWith(github.ref, '/main') }}
         env : 
           VALUE_FILE: ./helm/values-prod.yaml
-          NAMESPACE: stage
+          NAMESPACE: prod
           RELEASE:  tracktor
         run: |
           helm upgrade --install --atomic --timeout 10m \
